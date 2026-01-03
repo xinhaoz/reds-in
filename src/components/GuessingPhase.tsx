@@ -36,6 +36,11 @@ export function GuessingPhase({
   const waitingCount = players.filter((p) => !p.hasGuessed).length;
   const maxGuess = players.length;
 
+  // Check if player joined late: hasGuessed is true but guess is null/undefined.
+  // This indicates they were marked as having guessed to not block progress, but didn't actually participate.
+  const isLateJoiner =
+    hasGuessed && (currentGuess === null || currentGuess === undefined);
+
   useEffect(() => {
     if (currentGuess !== null && currentGuess !== undefined) {
       setGuess(currentGuess.toString());
@@ -62,6 +67,36 @@ export function GuessingPhase({
       });
     }
   };
+
+  if (isLateJoiner) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">
+            Make Your Guess
+          </CardTitle>
+          <CardDescription className="text-center">
+            {allGuessed
+              ? "All players have guessed. Calculating results..."
+              : `Waiting for ${waitingCount} player${
+                  waitingCount !== 1 ? "s" : ""
+                } to guess`}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-col items-center justify-center py-8">
+            <p className="text-center text-lg text-muted-foreground">
+              You joined this round after voting had already completed.
+            </p>
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              You&apos;re observing this round. You&apos;ll be able to
+              participate in the next round.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

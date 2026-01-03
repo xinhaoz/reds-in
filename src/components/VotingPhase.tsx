@@ -34,6 +34,11 @@ export function VotingPhase({
   const allVoted = players.every((p) => p.hasVoted);
   const waitingCount = players.filter((p) => !p.hasVoted).length;
 
+  // Check if player joined late: hasVoted is true but vote is null/undefined.
+  // This indicates they were marked as having voted to not block progress, but didn't actually participate.
+  const isLateJoiner =
+    hasVoted && (currentVote === null || currentVote === undefined);
+
   useEffect(() => {
     if (currentVote) {
       setSelectedVote(currentVote);
@@ -50,6 +55,34 @@ export function VotingPhase({
       vote: newVote,
     });
   };
+
+  if (isLateJoiner) {
+    return (
+      <Card className="w-full max-w-2xl mx-auto">
+        <CardHeader>
+          <CardTitle className="text-2xl text-center">Cast Your Vote</CardTitle>
+          <CardDescription className="text-center">
+            {allVoted
+              ? "All players have voted. Moving to guessing phase..."
+              : `Waiting for ${waitingCount} player${
+                  waitingCount !== 1 ? "s" : ""
+                } to vote`}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex flex-col items-center justify-center py-8">
+            <p className="text-center text-lg text-muted-foreground">
+              You joined this round after it had already started.
+            </p>
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              You&apos;re observing this round. You&apos;ll be able to
+              participate in the next round.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">

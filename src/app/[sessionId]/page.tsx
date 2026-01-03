@@ -17,7 +17,6 @@ export default function SessionPage() {
   const router = useRouter();
   const sessionId = params.sessionId as string;
   const playerName = searchParams.get("playerName");
-  const isNew = searchParams.get("isNew") === "true";
 
   const { sessionState, playerId, error, isConnected } = useSocket(
     sessionId,
@@ -32,11 +31,10 @@ export default function SessionPage() {
       socket.emit("join-session", {
         sessionId,
         playerName: playerName || "",
-        isNew: isNew || false,
       });
       setHasJoined(true);
     }
-  }, [sessionId, playerName, isNew, isConnected, hasJoined]);
+  }, [sessionId, playerName, isConnected, hasJoined]);
 
   if (error) {
     return (

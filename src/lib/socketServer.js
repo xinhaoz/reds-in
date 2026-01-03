@@ -17,7 +17,7 @@ function setupSocketServer(io) {
 
     socket.on("join-session", (data) => {
       try {
-        const { sessionId, playerName, isNew } = data;
+        const { sessionId, playerName } = data;
 
         const finalPlayerName =
           !playerName ||
@@ -28,28 +28,30 @@ function setupSocketServer(io) {
             : generateAnonymousName();
 
         let session;
-        if (isNew) {
-          if (!validateSessionName(sessionId)) {
+        // Try to join the session first.
+        try {
+          session = joinSession(sessionId, finalPlayerName);
+        } catch (error) {
+          // If session doesn't exist, try to create it.
+          if (error.message === "Session not found") {
+            if (!validateSessionName(sessionId)) {
+              socket.emit("error", {
+                message:
+                  "Invalid session name. Must be 3-50 characters, alphanumeric + hyphens/underscores only.",
+              });
+              return;
+            }
+            try {
+              session = createSession(sessionId, finalPlayerName);
+            } catch (createError) {
+              socket.emit("error", {
+                message: createError.message || "Failed to create session",
+              });
+              return;
+            }
+          } else {
             socket.emit("error", {
-              message:
-                "Invalid session name. Must be 3-50 characters, alphanumeric + hyphens/underscores only.",
-            });
-            return;
-          }
-          try {
-            session = createSession(sessionId, finalPlayerName);
-          } catch (error) {
-            socket.emit("error", {
-              message: error.message || "Failed to create session",
-            });
-            return;
-          }
-        } else {
-          try {
-            session = joinSession(sessionId, finalPlayerName);
-          } catch (error) {
-            socket.emit("error", {
-              message: error.message || "Session not found",
+              message: error.message || "Failed to join session",
             });
             return;
           }

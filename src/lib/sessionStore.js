@@ -50,14 +50,20 @@ function joinSession(sessionId, playerName) {
   const playerId = `player-${Date.now()}-${Math.random()
     .toString(36)
     .substr(2, 9)}`;
+
+  // If joining during guessing or results phase, mark player as observer.
+  // They won't block phase transitions but will see the current state.
+  const isLateJoiner =
+    session.phase === "guessing" || session.phase === "results";
+
   const player = {
     id: playerId,
     name: playerName,
     vote: null,
     guess: null,
     isCorrect: null,
-    hasVoted: false,
-    hasGuessed: false,
+    hasVoted: isLateJoiner,
+    hasGuessed: isLateJoiner,
     isHost: false,
   };
 

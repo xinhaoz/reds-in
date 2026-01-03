@@ -32,6 +32,12 @@ export function ResultsPhase({
   const isCorrect = currentPlayer?.isCorrect ?? null;
   const isHost = currentPlayer?.isHost ?? false;
 
+  // Check if player joined late: hasGuessed is true but guess is null/undefined.
+  // This indicates they were marked as having guessed to not block progress, but didn't actually participate.
+  const isLateJoiner =
+    currentPlayer?.hasGuessed &&
+    (currentPlayer?.guess === null || currentPlayer?.guess === undefined);
+
   const handleNextRound = () => {
     socket.emit("next-round", { sessionId, playerId: currentPlayerId });
   };
@@ -49,7 +55,17 @@ export function ResultsPhase({
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex flex-col items-center justify-center py-8">
-          {isCorrect ? (
+          {isLateJoiner ? (
+            <div className="flex flex-col items-center gap-4">
+              <p className="text-center text-lg text-muted-foreground">
+                You joined this round after it had already started.
+              </p>
+              <p className="text-center text-sm text-muted-foreground mt-2">
+                You&apos;re observing this round. You&apos;ll be able to
+                participate in the next round.
+              </p>
+            </div>
+          ) : isCorrect ? (
             <div className="flex flex-col items-center gap-4">
               <CheckCircle2 className="w-32 h-32 text-green-500" />
               <p className="text-3xl font-bold text-green-500">CORRECT!</p>
@@ -60,9 +76,11 @@ export function ResultsPhase({
               <p className="text-3xl font-bold text-red-500">INCORRECT</p>
             </div>
           )}
-          <p className="text-muted-foreground mt-4">
-            Your guess: {currentPlayer?.guess ?? "N/A"} | Actual: {redCount}
-          </p>
+          {!isLateJoiner && (
+            <p className="text-muted-foreground mt-4">
+              Your guess: {currentPlayer?.guess ?? "N/A"} | Actual: {redCount}
+            </p>
+          )}
         </div>
         {isHost ? (
           <Button onClick={handleNextRound} className="w-full" size="lg">

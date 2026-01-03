@@ -48,15 +48,15 @@ export default function HomePage() {
       }
       setError("");
       const nameParam = playerName.trim()
-        ? `?playerName=${encodeURIComponent(playerName)}&isNew=true`
-        : "?isNew=true";
+        ? `?playerName=${encodeURIComponent(playerName)}`
+        : "";
       router.push(`/${createSessionName}${nameParam}`);
     } else {
       const randomId = generateRandomSessionId();
       setError("");
       const nameParam = playerName.trim()
-        ? `?playerName=${encodeURIComponent(playerName)}&isNew=true`
-        : "?isNew=true";
+        ? `?playerName=${encodeURIComponent(playerName)}`
+        : "";
       router.push(`/${randomId}${nameParam}`);
     }
   };
