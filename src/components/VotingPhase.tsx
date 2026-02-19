@@ -95,6 +95,9 @@ export function VotingPhase({
         <p className="text-white/50 text-sm">
           Waiting for {waitingCount} player{waitingCount !== 1 ? "s" : ""} to vote
         </p>
+        <p className="text-white/30 text-xs">
+          You voted <span className="font-semibold">{selectedVote?.toUpperCase()}</span>
+        </p>
         <Button
           variant="outline"
           className="mt-4"
@@ -121,8 +124,8 @@ export function VotingPhase({
             size="lg"
             className={`flex-1 h-24 text-xl text-white font-bold ${
               selectedVote === "red"
-                ? "bg-red-600 hover:bg-red-700 ring-2 ring-white ring-offset-background"
-                : "bg-red-500/50 hover:bg-red-600/70 text-white"
+                ? "bg-red-700 hover:bg-red-800 dark:bg-red-600 dark:hover:bg-red-700 ring-2 ring-white ring-offset-background"
+                : "bg-red-600/60 hover:bg-red-700/70 dark:bg-red-500/50 dark:hover:bg-red-600/70 text-white"
             }`}
             onClick={() => handleVote("red")}
             disabled={allVoted}
