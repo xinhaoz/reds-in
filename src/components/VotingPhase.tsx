@@ -101,7 +101,14 @@ export function VotingPhase({
         <Button
           variant="outline"
           className="mt-4"
-          onClick={() => setPrivacyScreen(false)}
+          onClick={() => {
+            setPrivacyScreen(false);
+            socket.emit("vote", {
+              sessionId,
+              playerId: currentPlayerId,
+              vote: null,
+            });
+          }}
         >
           Change vote
         </Button>
