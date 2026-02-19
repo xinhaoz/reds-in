@@ -26,6 +26,7 @@ export function VotingPhase({
   const [selectedVote, setSelectedVote] = useState<"red" | "black" | null>(
     null,
   );
+  const [privacyScreen, setPrivacyScreen] = useState(false);
   const socket = getSocket();
 
   const currentPlayer = players.find((p) => p.id === currentPlayerId);
@@ -39,6 +40,7 @@ export function VotingPhase({
   const isLateJoiner =
     hasVoted && (currentVote === null || currentVote === undefined);
 
+
   useEffect(() => {
     if (currentVote) {
       setSelectedVote(currentVote);
@@ -49,6 +51,7 @@ export function VotingPhase({
     // Toggle: if clicking the same vote, deselect it
     const newVote = selectedVote === vote ? null : vote;
     setSelectedVote(newVote);
+    if (newVote) setPrivacyScreen(true);
     socket.emit("vote", {
       sessionId,
       playerId: currentPlayerId,
@@ -85,6 +88,22 @@ export function VotingPhase({
   }
 
   return (
+    <>
+    {privacyScreen && (
+      <div className="fixed inset-0 z-50 bg-black/95 flex flex-col items-center justify-center gap-6">
+        <p className="text-white text-2xl font-semibold">Vote submitted</p>
+        <p className="text-white/50 text-sm">
+          Waiting for {waitingCount} player{waitingCount !== 1 ? "s" : ""} to vote
+        </p>
+        <Button
+          variant="outline"
+          className="mt-4"
+          onClick={() => setPrivacyScreen(false)}
+        >
+          Change vote
+        </Button>
+      </div>
+    )}
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle className="text-2xl text-center">Cast Your Vote</CardTitle>
@@ -131,5 +150,6 @@ export function VotingPhase({
         )}
       </CardContent>
     </Card>
+    </>
   );
 }
